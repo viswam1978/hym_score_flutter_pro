@@ -13,7 +13,7 @@ class Subject extends HiveObject {
   @HiveField(2)
   DateTime dateOfBirth;
 
-  Patient({
+  Subject({
     required this.id,
     required this.name,
     required this.dateOfBirth,

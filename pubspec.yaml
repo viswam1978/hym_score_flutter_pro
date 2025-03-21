@@ -30,6 +30,8 @@ dependencies:
   hive_flutter: ^1.1.0
   encrypt: ^5.0.1
   flutter_secure_storage: ^9.0.0
+  file_saver: ^0.2.7
+  mime: ^1.0.4
 
 dev_dependencies:
   flutter_test:
