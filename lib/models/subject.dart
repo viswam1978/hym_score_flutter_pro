@@ -1,9 +1,9 @@
 import 'package:hive/hive.dart';
 
-part 'patient.g.dart';
+part 'subject.g.dart';
 
 @HiveType(typeId: 0)
-class Patient extends HiveObject {
+class Subject extends HiveObject {
   @HiveField(0)
   String id;
 

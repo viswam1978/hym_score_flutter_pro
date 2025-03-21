@@ -1,38 +1,41 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'patient.dart';
+part of 'assessment.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class PatientAdapter extends TypeAdapter<Patient> {
+class AssessmentAdapter extends TypeAdapter<Assessment> {
   @override
-  final int typeId = 0;
+  final int typeId = 1;
 
   @override
-  Patient read(BinaryReader reader) {
+  Assessment read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Patient(
-      id: fields[0] as String,
-      name: fields[1] as String,
-      dateOfBirth: fields[2] as DateTime,
+    return Assessment(
+      subjectId: fields[0] as String,
+      date: fields[1] as DateTime,
+      jointStrengths: (fields[2] as Map).cast<String, int>(),
+      gripStrength: fields[3] as int?,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Patient obj) {
+  void write(BinaryWriter writer, Assessment obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
-      ..write(obj.id)
+      ..write(obj.subjectId)
       ..writeByte(1)
-      ..write(obj.name)
+      ..write(obj.date)
       ..writeByte(2)
-      ..write(obj.dateOfBirth);
+      ..write(obj.jointStrengths)
+      ..writeByte(3)
+      ..write(obj.gripStrength);
   }
 
   @override
@@ -41,7 +44,7 @@ class PatientAdapter extends TypeAdapter<Patient> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is PatientAdapter &&
+      other is AssessmentAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
