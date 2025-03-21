@@ -26,11 +26,17 @@ dependencies:
   cloud_firestore: ^5.6.5
   share_plus: ^7.0.2  # Use the latest stable version
   fl_chart: ^0.70.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  encrypt: ^5.0.1
+  flutter_secure_storage: ^9.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.6
 
 dependency_overrides:
   cupertino_icons: ^1.0.5
