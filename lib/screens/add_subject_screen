@@ -23,7 +23,12 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
         dateOfBirth: _selectedDate!,
       );
       await subjectBox.add(subject);
-      Navigator.pop(context, subject.name);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => SubjectTimelineScreen(subject: subject),
+        ),
+      );
     }
   }
 
