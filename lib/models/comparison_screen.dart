@@ -10,16 +10,21 @@ import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/rendering.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:file_saver/file_saver.dart';
+import 'package:mime/mime.dart';
+import '../screens/date_range_export_screen.dart';
 
 class ComparisonScreen extends StatelessWidget {
   final Assessment current;
   final Assessment comparison;
+  final String subjectName;
   final GlobalKey chartKey = GlobalKey();
 
   const ComparisonScreen({
     super.key,
     required this.current,
     required this.comparison,
+    required this.subjectName,
   });
 
   int calculateTotal(Map<String, Map<String, int>> scores) {
@@ -42,7 +47,7 @@ class ComparisonScreen extends StatelessWidget {
     final chartImage = pw.MemoryImage(imageBytes);
 
     final now = DateTime.now();
-    final pdfFileName = 'HYM_Comparison_${now.toIso8601String().split('T').first}.pdf';
+    final pdfFileName = 'HYM_${subjectName}_${now.toIso8601String().split('T').first}.pdf';
 
     pdf.addPage(
       pw.Page(
@@ -50,6 +55,8 @@ class ComparisonScreen extends StatelessWidget {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text('HYM Score Comparison Report', style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 10),
+            pw.Text('Subject: $subjectName'),
             pw.SizedBox(height: 10),
             pw.Text('Assessment 1: ${comparison.date.toLocal().toIso8601String().split("T").first}'),
             pw.Text('Assessment 2: ${current.date.toLocal().toIso8601String().split("T").first}'),
@@ -81,19 +88,22 @@ class ComparisonScreen extends StatelessWidget {
       ),
     );
 
-    final output = await getTemporaryDirectory();
-    final file = File('${output.path}/$pdfFileName');
-    await file.writeAsBytes(await pdf.save());
-
-    await Share.shareXFiles([XFile(file.path)], text: 'Assessment Comparison PDF');
+    final pdfBytes = await pdf.save();
+    await FileSaver.instance.saveFile(
+      name: pdfFileName.replaceAll('.pdf', ''),
+      bytes: pdfBytes,
+      ext: 'pdf',
+      mimeType: MimeType.PDF,
+    );
   }
 
   void exportToCsv(BuildContext context) async {
     final now = DateTime.now();
-    final fileName = 'HYM_Comparison_${now.toIso8601String().split('T').first}.csv';
+    final fileName = 'HYM_${subjectName}_${now.toIso8601String().split('T').first}.csv';
 
     List<List<dynamic>> rows = [
       ['HYM Score Comparison'],
+      ['Subject', subjectName],
       ['Assessment 1', comparison.date.toIso8601String().split("T").first],
       ['Assessment 2', current.date.toIso8601String().split("T").first],
       [],
@@ -113,12 +123,13 @@ class ComparisonScreen extends StatelessWidget {
     });
 
     String csvData = const ListToCsvConverter().convert(rows);
-    final directory = await getTemporaryDirectory();
-    final path = '${directory.path}/$fileName';
-    final file = File(path);
-    await file.writeAsString(csvData);
 
-    await Share.shareXFiles([XFile(path)], text: 'Assessment Comparison CSV');
+    await FileSaver.instance.saveFile(
+      name: fileName.replaceAll('.csv', ''),
+      bytes: Uint8List.fromList(csvData.codeUnits),
+      ext: 'csv',
+      mimeType: MimeType.CSV,
+    );
   }
 
   @override
@@ -202,6 +213,16 @@ class ComparisonScreen extends StatelessWidget {
                   onPressed: () => exportToCsv(context),
                   icon: Icon(Icons.table_chart),
                   label: Text('Export CSV'),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => DateRangeExportScreen(subjectName: subjectName),
+                    ),
+                  ),
+                  icon: Icon(Icons.date_range),
+                  label: Text('Export by Date Range'),
                 ),
               ],
             ),
