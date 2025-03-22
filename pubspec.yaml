@@ -1,4 +1,4 @@
-name: hym_score_flutter
+name: hym_score_flutter_pro
 description: "A new Flutter project."
 # This project is not intended for publishing to pub.dev
 publish_to: 'none'
@@ -33,12 +33,12 @@ dependencies:
   mime: ^1.0.4
   pdf: ^3.10.4
   printing: ^5.11.0
+  model_viewer_plus: ^1.7.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-  hive_generator: ^2.0.1
   build_runner: ^2.4.6
 
 dependency_overrides:

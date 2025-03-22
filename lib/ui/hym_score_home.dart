@@ -8,6 +8,7 @@ import 'help_screen.dart';
 import '../widgets/joint_marker.dart';
 import '../utils/joint_positions.dart';
 import '../models/joint_strength.dart';
+import 'package:hym_score_flutter_pro/views/three_d/three_d_model_viewer.dart';
 
 class HYMScoreHome extends StatefulWidget {
   final String name;
@@ -174,77 +175,93 @@ class _HYMScoreHomeState extends State<HYMScoreHome> {
         centerTitle: true,
         backgroundColor: Colors.blue,
       ),
-      body: Stack(
-        alignment: Alignment.center,
-        children: [
-          Image.asset(
-            'assets/body_memoji.png',
-            width: 400,
-            height: 800,
-            fit: BoxFit.contain,
-          ),
-          ...draggablePositions.entries.map((entry) {
-            return Positioned(
-              left: entry.value.dx * 400 - 15,
-              top: (entry.value.dy * 800) - 70,
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.4),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '${_jointStrengths[entry.key]?.movement1}/${_jointStrengths[entry.key]?.movement2}',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        shadows: [Shadow(color: Colors.black, blurRadius: 2)],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          const double scaleFactor = 1.3;
+          final double imageWidth = 400 * scaleFactor;
+          final double imageHeight = 800 * scaleFactor;
+          final imageLeftOffset = (constraints.maxWidth - imageWidth) / 2;
+          final imageTopOffset = (constraints.maxHeight - imageHeight) / 2;
+
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              Center(
+                child: Transform.scale(
+                  scale: 1.3,
+                  child: Image.asset(
+                    'assets/body_memoji.png',
+                    width: 400,
+                    height: 800,
+                    fit: BoxFit.contain,
                   ),
-                  GestureDetector(
-                    onPanUpdate: (details) {
-                      setState(() {
-                        double newX = entry.value.dx + details.delta.dx / 400;
-                        double newY = entry.value.dy + details.delta.dy / 800;
-                        newX = newX.clamp(0.0, 1.0);
-                        newY = newY.clamp(0.0, 1.0);
-                        draggablePositions[entry.key] = Offset(newX, newY);
-                      });
-                    },
-                    child: JointMarker(
-                      absolutePosition: entry.value,
-                      onTap: () {
-                        _onMarkerSelected(entry.key);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-          Positioned(
-            bottom: 80,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Text(
-                _enteredName,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  shadows: [Shadow(color: Colors.white, blurRadius: 4)],
                 ),
               ),
-            ),
-          ),
-          if (_showNameEntryPopup) _nameEntryPopup(),
-        ],
+              ...draggablePositions.entries.map((entry) {
+                final dx = entry.value.dx * imageWidth;
+                final dy = entry.value.dy * imageHeight;
+
+                return Positioned(
+                  left: imageLeftOffset + dx - 15,
+                  top: imageTopOffset + dy - 70,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.4),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            '${_jointStrengths[entry.key]?.movement1}/${_jointStrengths[entry.key]?.movement2}',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              shadows: [Shadow(color: Colors.black, blurRadius: 2)],
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            _onMarkerSelected(entry.key);
+                          },
+                          child: JointMarker(
+                            absolutePosition: entry.value,
+                            size: 20,
+                            onTap: () {
+                              _onMarkerSelected(entry.key);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+              Positioned(
+                bottom: 20,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Text(
+                    _enteredName,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      shadows: [Shadow(color: Colors.white, blurRadius: 4)],
+                    ),
+                  ),
+                ),
+              ),
+              if (_showNameEntryPopup) _nameEntryPopup(),
+            ],
+          );
+        },
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -256,6 +273,15 @@ class _HYMScoreHomeState extends State<HYMScoreHome> {
           BottomNavigationBarItem(icon: Icon(Icons.download), label: 'Export'),
           BottomNavigationBarItem(icon: Icon(Icons.help_outline), label: 'Help'),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ThreeDModelViewer()),
+          );
+        },
+        child: const Icon(Icons.threed_rotation),
       ),
     );
   }

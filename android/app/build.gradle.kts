@@ -15,7 +15,7 @@ plugins {
 android {
     namespace = "com.example.hym_score_flutter_pro"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
