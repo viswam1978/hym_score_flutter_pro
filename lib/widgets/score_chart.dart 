@@ -1,0 +1,94 @@
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import '../models/StrengthRecord.dart';
+
+class ScoreChart extends StatelessWidget {
+  final List<StrengthRecord> records;
+  final String filter;
+  final String movementFilter;
+
+  const ScoreChart({
+    super.key,
+    required this.records,
+    required this.filter,
+    this.movementFilter = 'Both',
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (records.isEmpty) {
+      return const Center(child: Text('No data to display'));
+    }
+
+    final sorted = List<StrengthRecord>.from(records)
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+    List<FlSpot> spots = [];
+    for (int i = 0; i < sorted.length; i++) {
+      final record = sorted[i];
+      double score;
+
+      if (filter == 'Total Score') {
+        score = record.jointScores.values.fold<int>(0, (sum, js) {
+          if (movementFilter == 'Flexion') return sum + js.movement1;
+          if (movementFilter == 'Extension') return sum + js.movement2;
+          return sum + js.movement1 + js.movement2;
+        }).toDouble();
+      } else {
+        final js = record.jointScores[filter];
+        if (js != null) {
+          if (movementFilter == 'Flexion') {
+            score = js.movement1.toDouble();
+          } else if (movementFilter == 'Extension') {
+            score = js.movement2.toDouble();
+          } else {
+            score = (js.movement1 + js.movement2).toDouble();
+          }
+        } else {
+          score = 0.0;
+        }
+      }
+
+      spots.add(FlSpot(i.toDouble(), score));
+    }
+
+    return SizedBox(
+      height: 200,
+      child: LineChart(
+        LineChartData(
+          borderData: FlBorderData(show: true),
+          titlesData: FlTitlesData(
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  int index = value.toInt();
+                  if (index >= 0 && index < sorted.length) {
+                    final date = sorted[index].timestamp;
+                    return Text(
+                      "${date.month}/${date.day}",
+                      style: const TextStyle(fontSize: 10),
+                    );
+                  }
+                  return const Text('');
+                },
+              ),
+            ),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: true),
+            ),
+          ),
+          lineBarsData: [
+            LineChartBarData(
+              spots: spots,
+              isCurved: true,
+              barWidth: 3,
+              color: Colors.blueAccent,
+              dotData: FlDotData(show: true),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
