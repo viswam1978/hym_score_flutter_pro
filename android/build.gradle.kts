@@ -6,6 +6,15 @@ val keystoreProperties = Properties().apply {
     load(FileInputStream(keystorePropertiesFile))
 }
 
+buildscript {
+    dependencies {
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
 allprojects {
     repositories {
         google()
